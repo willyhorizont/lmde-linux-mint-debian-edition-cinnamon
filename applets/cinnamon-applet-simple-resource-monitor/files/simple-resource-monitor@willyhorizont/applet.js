@@ -63,22 +63,48 @@ SimpleResourceMonitorApplet.prototype = {
             global.logError("Failed to launch subprocess: " + e.message);
         }
     },
-    _format_rate: function(bytes_per_second) {
-        if (bytes_per_second <= 0 || isNaN(bytes_per_second)) return "0B/s";
+    _pad_with_x: function(str, target_length) {
+        return str.padStart(target_length, '0');
+    },
+
+    _format_rate_pattern: function(bytes_per_second) {
+        if (bytes_per_second <= 0 || isNaN(bytes_per_second)) return "000.000B/s";
         const units = ["B/s", "KB/s", "MB/s"];
         let i = 0;
-        while (bytes_per_second >= 1024 && i < units.length - 1) {
-            bytes_per_second /= 1024;
+        let value = bytes_per_second;
+        while (value >= 1024 && i < units.length - 1) {
+            value /= 1024;
             i += 1;
         }
-        return i === 0 ? `${Math.round(bytes_per_second)}${units[i]}` : `${bytes_per_second.toFixed(3)}${units[i]}`;
+
+        let num_str = "";
+        if (i === 0) {
+            num_str = value.toFixed(3);
+        } else {
+            num_str = value.toFixed(2);
+        }
+
+        const parts = num_str.split('.');
+        const front = parts[0];
+        const back = parts[1];
+
+        if (front.length > 3) return "999999GB/s";
+
+        const fixed_front = this._pad_with_x(front, 3);
+        return `${fixed_front}.${back}${units[i]}`;
     },
 
     _parse_and_display: function(output) {
         const parts = output.split('|');
         if (parts.length < 7) return;
 
-        const temp = parts[0];
+        const temp_val = parseFloat(parts[0]) || 0;
+        let temp = "";
+        if (temp_val >= 100.0) {
+            temp = "9999";
+        } else {
+            temp = temp_val.toFixed(1);
+        }
 
         const cpu_raw = parts[1].split(' ');
         const user = parseInt(cpu_raw[0]) || 0;
@@ -88,39 +114,40 @@ SimpleResourceMonitorApplet.prototype = {
         const iowait = parseInt(cpu_raw[4]) || 0;
         const irq = parseInt(cpu_raw[5]) || 0;
         const softirq = parseInt(cpu_raw[6]) || 0;
-
         const old_idle = this.last_cpu.idle + this.last_cpu.iowait;
         const new_idle = idle + iowait;
         const old_non_idle = this.last_cpu.user + this.last_cpu.nice + this.last_cpu.system + this.last_cpu.irq + this.last_cpu.softirq;
         const new_non_idle = user + nice + system + irq + softirq;
-
         const total_old = old_idle + old_non_idle;
         const total_new = new_idle + new_non_idle;
-
         const total_delta = total_new - total_old;
         const idle_delta = new_idle - old_idle;
-
         let cpu_percent = 0.0;
         if (total_delta > 0) {
             cpu_percent = ((total_delta - idle_delta) / total_delta) * 100;
         }
-
         this.last_cpu = { user, nice, system, idle, iowait, irq, softirq };
+        const cpu_str = cpu_percent.toFixed(1);
+        const cpu = this._pad_with_x(cpu_str, 4);
 
-        const gpu = parts[2];
-        const ram = parts[3];
+        const gpu_val = parseFloat(parts[2]) || 0;
+        const gpu = this._pad_with_x(gpu_val.toFixed(1), 4);
+
+        const ram_raw = parts[3].split('/');
+        const ram_used_gb = parseFloat(ram_raw[0]) || 0;
+        const ram_total_gb = parseFloat(ram_raw[1]) || 0;
+        const ram_used_str = this._pad_with_x(ram_used_gb.toFixed(2), 5);
+        const ram_total_str = ram_total_gb.toFixed(2);
 
         const disk_raw = parts[4].split('/');
         const disk_total_bytes = parseInt(disk_raw[0]) || 0;
         const disk_available_bytes = parseInt(disk_raw[1]) || 0;
         const disk_free_gb = (disk_available_bytes / 1e9).toFixed(2);
         const disk_total_gb = (disk_total_bytes / 1e9).toFixed(2);
-        const disk_string = `${disk_free_gb}/${disk_total_gb}`;
 
         const disk_io = parts[5].split(' ');
         const current_disk_read = (parseInt(disk_io[0]) || 0) * 512;
         const current_disk_write = (parseInt(disk_io[1]) || 0) * 512;
-
         const net_io = parts[6].split(' ');
         const current_net_down = parseInt(net_io[0]) || 0;
         const current_net_up = parseInt(net_io[1]) || 0;
@@ -138,16 +165,27 @@ SimpleResourceMonitorApplet.prototype = {
         w_rate = Math.max(0, w_rate);
         d_rate = Math.max(0, d_rate);
         u_rate = Math.max(0, u_rate);
-
         this.last_time = now;
         this.last_bytes = { read: current_disk_read, write: current_disk_write, down: current_net_down, up: current_net_up };
 
-        const f_r = this._format_rate(r_rate);
-        const f_w = this._format_rate(w_rate);
-        const f_d = this._format_rate(d_rate);
-        const f_u = this._format_rate(u_rate);
+        const f_r = this._format_rate_pattern(r_rate);
+        const f_w = this._format_rate_pattern(w_rate);
+        const f_d = this._format_rate_pattern(d_rate);
+        const f_u = this._format_rate_pattern(u_rate);
 
-        const labelText = `T ${temp}°C | C ${cpu_percent.toFixed(1)}% | G ${gpu}% | M ${ram}GB | D ${disk_string}GB | R ${f_r} | W ${f_w} | ↓ ${f_d} | ↑ ${f_u}`;
+        let labelText = "";
+        if (temp === "9999" || f_r.includes("999999") || f_w.includes("999999") || f_d.includes("999999") || f_u.includes("999999")) {
+            let out_temp = temp === "9999" ? "9999°C" : `${temp}°C`;
+            let out_r = f_r.includes("999999") ? "999999GB/s" : f_r;
+            let out_w = f_w.includes("999999") ? "999999GB/s" : f_w;
+            let out_d = f_d.includes("999999") ? "999999GB/s" : f_d;
+            let out_u = f_u.includes("999999") ? "999999GB/s" : f_u;
+
+            labelText = `T ${out_temp} | C ${cpu}% | G ${gpu}% | M ${ram_used_str}/${ram_total_str}GB | D ${disk_free_gb}/${disk_total_gb}GB | R ${out_r} | W ${out_w} | ↓ ${out_d} | ↑ ${out_u}`;
+        } else {
+            labelText = `T ${temp}°C | C ${cpu}% | G ${gpu}% | M ${ram_used_str}/${ram_total_str}GB | D ${disk_free_gb}/${disk_total_gb}GB | R ${f_r} | W ${f_w} | ↓ ${f_d} | ↑ ${f_u}`;
+        }
+
         this.set_applet_label(labelText);
     },
 

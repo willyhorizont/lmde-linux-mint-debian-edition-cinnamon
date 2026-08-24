@@ -11,7 +11,7 @@ FreeTextApplet.prototype = {
         Applet.TextApplet.prototype._init.call(this, orientation, instance_id);
         this.set_applet_tooltip("Free Text");
 
-        this.set_applet_label(" | willyhorizont.github.io | space available | ");
+        this.set_applet_label("|         willyhorizont.github.io         |");
     }
 };
 
