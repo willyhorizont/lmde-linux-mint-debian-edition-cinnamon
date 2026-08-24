@@ -13,7 +13,7 @@ My LMDE Linux Mint Debian Edition Cinnamon ricing
 
 ### Output
 ```
-T 39.0°C | C 2.8% | G 0% | M 1.31GB/14.35GB | D 181.35GB/220.35GB | R 1.345B/s | W 1.345B/s | ↓ 1.345B/s | ↑ 1.345B/s
+T 39.0°C | C 2.8% | G 0% | M 1.31GB/14.35GB | D 181.35GB/220.35GB | R 1.345B/s | W 1.345B/s | ▼ 1.345B/s | ▲ 1.345B/s
 ```
 
 ### Description
@@ -24,8 +24,8 @@ M = RAM usage per total RAM (swap not includes);
 D = Free Disk per total Disk;  
 R = All Disk read rate;  
 W = All Disk write rate;  
-↓ = Download rate;  
-↑ = Upload rate;  
+▼ = Download rate;  
+▲ = Upload rate;  
 
 ### Screenshot
 ![My Cinnamon Applet Screenshot](https://github.com/willyhorizont/lmde-linux-mint-debian-edition-cinnamon/blob/main/screenshot.jpg)  

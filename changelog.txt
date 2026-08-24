@@ -1,3 +1,6 @@
+[Last updated: 25 Aug 2026 @ 02:16 AM][version: 0.0.7]
+update README;
+
 [Last updated: 25 Aug 2026 @ 12:14 AM][version: 0.0.6]
 update simple-resource-monitor applet;
 update simple-clock applet;
