@@ -1,9 +1,6 @@
-# lmde-linux-mint-debian-edition-cinnamon
-My LMDE Linux Mint Debian Edition Cinnamon ricing
+# Simple Resouce Monitor Cinnamon Applet
 
-## cinnamon-applet-simple-resource-monitor  
-
-### Features
+## Features
 * Informative
 * Lightweight
 * Text only
@@ -11,12 +8,12 @@ My LMDE Linux Mint Debian Edition Cinnamon ricing
 * Zero config
 * Zero dependencies
 
-### Output
+## Output
 ```
 T 39.0°C | C 2.8% | G 0% | M 1.31GB/14.35GB | D 181.35GB/220.35GB | R 1.345B/s | W 1.345B/s | ↓ 1.345B/s | ↑ 1.345B/s
 ```
 
-### Description
+## Description
 T = Average CPU temp;  
 C = Total CPU usage;  
 G = Total GPU usage;  
@@ -27,6 +24,6 @@ W = All Disk write rate;
 ↓ = Download rate;  
 ↑ = Upload rate;  
 
-### Screenshot
+## Screenshot
 ![Simple Resouce Monitor Cinnamon Applet Screenshot 1](https://github.com/willyhorizont/lmde-linux-mint-debian-edition-cinnamon/blob/main/panel/cinnamon-applet-simple-resource-monitor/screenshot1.jpg)  
 ![Simple Resouce Monitor Cinnamon Applet Screenshot 2](https://github.com/willyhorizont/lmde-linux-mint-debian-edition-cinnamon/blob/main/panel/cinnamon-applet-simple-resource-monitor/screenshot2.jpg)  

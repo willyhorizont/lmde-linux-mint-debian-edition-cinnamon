@@ -1,3 +1,6 @@
+[Last updated: 24 Aug 2026 @ 06:20 PM][version: 0.0.3]
+init commit;
+
 [Last updated: 24 Aug 2026 @ 05:47 PM][version: 0.0.2]
 update README;
 
