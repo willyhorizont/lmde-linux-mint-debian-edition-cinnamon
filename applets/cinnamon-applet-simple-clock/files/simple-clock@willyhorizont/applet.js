@@ -2,21 +2,29 @@ const Applet = imports.ui.applet;
 const GLib = imports.gi.GLib;
 const Mainloop = imports.mainloop;
 
-function SimpleClockApplet(orientation, panel_height, instance_id) {
-    this._init(orientation, panel_height, instance_id);
+function SimpleClockApplet(o, p_h, id) {
+    this._init(o, p_h, id);
 }
 
 SimpleClockApplet.prototype = {
     __proto__: Applet.TextApplet.prototype,
 
-    _init: function(orientation, panel_height, instance_id) {
-        Applet.TextApplet.prototype._init.call(this, orientation, instance_id);
+    _init: function(o, p_h, id) {
+        Applet.TextApplet.prototype._init.call(this, o, id);
         this.set_applet_tooltip("Simple Clock");
 
-        this._update_clock();
+        if (this.actor) {
+            this.actor.set_style("background-color: #C2066D;");
+        }
+
+        if (this._applet_label) {
+            this._applet_label.set_style("font-family: monospace, Courier New; color: #ffffff;");
+        }
+
+        this._upd();
     },
 
-    _update_clock: function() {
+    _upd: function() {
         const now = GLib.DateTime.new_now_local();
         const month_num = now.format("%m");
         const day_num = now.format("%d");
@@ -29,12 +37,12 @@ SimpleClockApplet.prototype = {
         const time_24 = now.format("%H:%M:%S");
         const time_12 = now.format("%I:%M:%S %p");
 
-        const labelText = `${month_num} / 12 months | ${day_num} / ${total_days} days | ${date_string} | ${time_24} | ${time_12}`;
+        const labelText = `| ${month_num}/12 months | ${day_num}/${total_days} days | ${date_string} | ${time_24} | ${time_12} `;
 
         this.set_applet_label(labelText);
 
         this._scheduler = Mainloop.timeout_add(1000, () => {
-            this._update_clock();
+            this._upd();
             return false;
         });
     },
@@ -46,6 +54,6 @@ SimpleClockApplet.prototype = {
     }
 };
 
-function main(metadata, orientation, panel_height, instance_id) {
-    return new SimpleClockApplet(orientation, panel_height, instance_id);
+function main(metadata, o, p_h, id) {
+    return new SimpleClockApplet(o, p_h, id);
 }

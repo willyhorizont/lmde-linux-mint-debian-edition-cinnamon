@@ -3,28 +3,36 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const Mainloop = imports.mainloop;
 
-function SimpleResourceMonitorApplet(orientation, panel_height, instance_id) {
-    this._init(orientation, panel_height, instance_id);
+function SimpleResourceMonitorApplet(o, p_h, id) {
+    this._init(o, p_h, id);
 }
 
 SimpleResourceMonitorApplet.prototype = {
     __proto__: Applet.TextApplet.prototype,
 
-    _init: function(orientation, panel_height, instance_id) {
-        Applet.TextApplet.prototype._init.call(this, orientation, instance_id);
+    _init: function(o, p_h, id) {
+        Applet.TextApplet.prototype._init.call(this, o, id);
         this.set_applet_tooltip("Simple Resource Monitor");
         this.net_interface = "wlp3s0";
         this.last_time = GLib.get_monotonic_time();
         this.last_bytes = { read: 0, write: 0, down: 0, up: 0 };
         this.last_cpu = { user: 0, nice: 0, system: 0, idle: 0, iowait: 0, irq: 0, softirq: 0 };
 
-        this._update_loop();
+        if (this.actor) {
+            this.actor.set_style("background-color: #C2066D;");
+        }
+
+        if (this._applet_label) {
+            this._applet_label.set_style("font-family: monospace, Courier New; color: #ffffff;");
+        }
+
+        this._upd();
     },
 
-    _update_loop: function() {
+    _upd: function() {
         this._fetch_system_data();
         this._scheduler = Mainloop.timeout_add(2000, () => {
-            this._update_loop();
+            this._upd();
             return false;
         });
     },
@@ -51,59 +59,58 @@ SimpleResourceMonitorApplet.prototype = {
 
             proc.communicate_utf8_async(null, null, (obj, res) => {
                 try {
-                    const [success, stdout, stderr] = obj.communicate_utf8_finish(res);
-                    if (success && stdout) {
-                        this._parse_and_display(stdout.trim());
+                    const [ok, out, err] = obj.communicate_utf8_finish(res);
+                    if (ok && out) {
+                        this._parse_and_display(out.trim());
                     }
                 } catch (e) {
-                    global.logError("Failed read subprocess output: " + e.message);
+                    global.logError("Failed to read subprocess output: " + e.message);
                 }
             });
         } catch (e) {
             global.logError("Failed to launch subprocess: " + e.message);
         }
     },
-    _pad_with_x: function(str, target_length) {
-        return str.padStart(target_length, '0');
+    _pad: function(str, target_len) {
+        return str.padStart(target_len, ' ');
     },
 
-    _format_rate_pattern: function(bytes_per_second) {
-        if (bytes_per_second <= 0 || isNaN(bytes_per_second)) return "000.000B/s";
+    _fmt: function(bytes_p_sec) {
+        if (bytes_p_sec <= 0 || isNaN(bytes_p_sec)) return "      0B/s";
         const units = ["B/s", "KB/s", "MB/s"];
         let i = 0;
-        let value = bytes_per_second;
-        while (value >= 1024 && i < units.length - 1) {
-            value /= 1024;
+        let v = bytes_p_sec;
+        while (v >= 1024 && i < units.length - 1) {
+            v /= 1024;
             i += 1;
         }
 
         let num_str = "";
         if (i === 0) {
-            num_str = value.toFixed(3);
+            num_str = v.toFixed(3);
         } else {
-            num_str = value.toFixed(2);
+            num_str = v.toFixed(2);
         }
 
         const parts = num_str.split('.');
-        const front = parts[0];
-        const back = parts[1];
+        const f_p = parts[0];
+        const b_p = parts[1];
 
-        if (front.length > 3) return "999999GB/s";
+        if (f_p.length > 3) return "999999GB/s";
 
-        const fixed_front = this._pad_with_x(front, 3);
-        return `${fixed_front}.${back}${units[i]}`;
+        return `${this._pad(f_p, 3)}.${b_p}${units[i]}`;
     },
 
-    _parse_and_display: function(output) {
-        const parts = output.split('|');
+    _parse_and_display: function(o) {
+        const parts = o.split('|');
         if (parts.length < 7) return;
 
-        const temp_val = parseFloat(parts[0]) || 0;
+        const temp_v = parseFloat(parts[0]) || 0;
         let temp = "";
-        if (temp_val >= 100.0) {
+        if (temp_v >= 100.0) {
             temp = "9999";
         } else {
-            temp = temp_val.toFixed(1);
+            temp = temp_v.toFixed(1);
         }
 
         const cpu_raw = parts[1].split(' ');
@@ -118,75 +125,75 @@ SimpleResourceMonitorApplet.prototype = {
         const new_idle = idle + iowait;
         const old_non_idle = this.last_cpu.user + this.last_cpu.nice + this.last_cpu.system + this.last_cpu.irq + this.last_cpu.softirq;
         const new_non_idle = user + nice + system + irq + softirq;
-        const total_old = old_idle + old_non_idle;
-        const total_new = new_idle + new_non_idle;
-        const total_delta = total_new - total_old;
+        const tot_old = old_idle + old_non_idle;
+        const tot_new = new_idle + new_non_idle;
+        const tot_delta = tot_new - tot_old;
         const idle_delta = new_idle - old_idle;
         let cpu_percent = 0.0;
-        if (total_delta > 0) {
-            cpu_percent = ((total_delta - idle_delta) / total_delta) * 100;
+        if (tot_delta > 0) {
+            cpu_percent = ((tot_delta - idle_delta) / tot_delta) * 100;
         }
         this.last_cpu = { user, nice, system, idle, iowait, irq, softirq };
         const cpu_str = cpu_percent.toFixed(1);
-        const cpu = this._pad_with_x(cpu_str, 4);
+        const cpu = this._pad(cpu_str, 4);
 
-        const gpu_val = parseFloat(parts[2]) || 0;
-        const gpu = this._pad_with_x(gpu_val.toFixed(1), 4);
+        const gpu_v = parseFloat(parts[2]) || 0;
+        const gpu = this._pad(gpu_v.toFixed(1), 4);
 
         const ram_raw = parts[3].split('/');
-        const ram_used_gb = parseFloat(ram_raw[0]) || 0;
-        const ram_total_gb = parseFloat(ram_raw[1]) || 0;
-        const ram_used_str = this._pad_with_x(ram_used_gb.toFixed(2), 5);
-        const ram_total_str = ram_total_gb.toFixed(2);
+        const ram_used_gbytes = parseFloat(ram_raw[0]) || 0;
+        const ram_tot_gbytes = parseFloat(ram_raw[1]) || 0;
+        const ram_used_str = this._pad(ram_used_gbytes.toFixed(2), 5);
+        const ram_tot_str = ram_tot_gbytes.toFixed(2);
 
         const disk_raw = parts[4].split('/');
-        const disk_total_bytes = parseInt(disk_raw[0]) || 0;
-        const disk_available_bytes = parseInt(disk_raw[1]) || 0;
-        const disk_free_gb = (disk_available_bytes / 1e9).toFixed(2);
-        const disk_total_gb = (disk_total_bytes / 1e9).toFixed(2);
+        const disk_tot_bytes = parseInt(disk_raw[0]) || 0;
+        const disk_avail_bytes = parseInt(disk_raw[1]) || 0;
+        const disk_free_gbytes = (disk_avail_bytes / 1e9).toFixed(2);
+        const disk_tot_gbytes = (disk_tot_bytes / 1e9).toFixed(2);
 
         const disk_io = parts[5].split(' ');
-        const current_disk_read = (parseInt(disk_io[0]) || 0) * 512;
-        const current_disk_write = (parseInt(disk_io[1]) || 0) * 512;
+        const cur_disk_r = (parseInt(disk_io[0]) || 0) * 512;
+        const cur_disk_w = (parseInt(disk_io[1]) || 0) * 512;
         const net_io = parts[6].split(' ');
-        const current_net_down = parseInt(net_io[0]) || 0;
-        const current_net_up = parseInt(net_io[1]) || 0;
+        const cur_net_down = parseInt(net_io[0]) || 0;
+        const cur_net_up = parseInt(net_io[1]) || 0;
 
         const now = GLib.get_monotonic_time();
         let time_delta = (now - this.last_time) / 1000000.0;
         if (time_delta <= 0) time_delta = 2.0;
 
-        let r_rate = this.last_bytes.read > 0 ? ((current_disk_read - this.last_bytes.read) / time_delta) : 0;
-        let w_rate = this.last_bytes.write > 0 ? ((current_disk_write - this.last_bytes.write) / time_delta) : 0;
-        let d_rate = this.last_bytes.down > 0 ? ((current_net_down - this.last_bytes.down) / time_delta) : 0;
-        let u_rate = this.last_bytes.up > 0 ? ((current_net_up - this.last_bytes.up) / time_delta) : 0;
+        let r_rate = this.last_bytes.read > 0 ? ((cur_disk_r - this.last_bytes.read) / time_delta) : 0;
+        let w_rate = this.last_bytes.write > 0 ? ((cur_disk_w - this.last_bytes.write) / time_delta) : 0;
+        let d_rate = this.last_bytes.down > 0 ? ((cur_net_down - this.last_bytes.down) / time_delta) : 0;
+        let u_rate = this.last_bytes.up > 0 ? ((cur_net_up - this.last_bytes.up) / time_delta) : 0;
 
         r_rate = Math.max(0, r_rate);
         w_rate = Math.max(0, w_rate);
         d_rate = Math.max(0, d_rate);
         u_rate = Math.max(0, u_rate);
         this.last_time = now;
-        this.last_bytes = { read: current_disk_read, write: current_disk_write, down: current_net_down, up: current_net_up };
+        this.last_bytes = { read: cur_disk_r, write: cur_disk_w, down: cur_net_down, up: cur_net_up };
 
-        const f_r = this._format_rate_pattern(r_rate);
-        const f_w = this._format_rate_pattern(w_rate);
-        const f_d = this._format_rate_pattern(d_rate);
-        const f_u = this._format_rate_pattern(u_rate);
+        const f_r = this._fmt(r_rate);
+        const f_w = this._fmt(w_rate);
+        const f_d = this._fmt(d_rate);
+        const f_u = this._fmt(u_rate);
 
-        let labelText = "";
+        let rr = "";
         if (temp === "9999" || f_r.includes("999999") || f_w.includes("999999") || f_d.includes("999999") || f_u.includes("999999")) {
-            let out_temp = temp === "9999" ? "9999°C" : `${temp}°C`;
+            let out_t = temp === "9999" ? "9999°C" : `${temp}°C`;
             let out_r = f_r.includes("999999") ? "999999GB/s" : f_r;
             let out_w = f_w.includes("999999") ? "999999GB/s" : f_w;
             let out_d = f_d.includes("999999") ? "999999GB/s" : f_d;
             let out_u = f_u.includes("999999") ? "999999GB/s" : f_u;
 
-            labelText = `T ${out_temp} | C ${cpu}% | G ${gpu}% | M ${ram_used_str}/${ram_total_str}GB | D ${disk_free_gb}/${disk_total_gb}GB | R ${out_r} | W ${out_w} | ↓ ${out_d} | ↑ ${out_u}`;
+            rr = `T ${out_t} | C ${cpu}% | G ${gpu}% | M ${ram_used_str}/${ram_tot_str}GB | D ${disk_free_gbytes}/${disk_tot_gbytes}GB | R ${out_r} | W ${out_w} | ▼ ${out_d} | ▲ ${out_u} `;
         } else {
-            labelText = `T ${temp}°C | C ${cpu}% | G ${gpu}% | M ${ram_used_str}/${ram_total_str}GB | D ${disk_free_gb}/${disk_total_gb}GB | R ${f_r} | W ${f_w} | ↓ ${f_d} | ↑ ${f_u}`;
+            rr = `T ${temp}°C | C ${cpu}% | G ${gpu}% | M ${ram_used_str}/${ram_tot_str}GB | D ${disk_free_gbytes}/${disk_tot_gbytes}GB | R ${f_r} | W ${f_w} | ▼ ${f_d} | ▲ ${f_u} `;
         }
 
-        this.set_applet_label(labelText);
+        this.set_applet_label(rr);
     },
 
     on_applet_removed_from_panel: function() {
@@ -196,6 +203,6 @@ SimpleResourceMonitorApplet.prototype = {
     }
 };
 
-function main(metadata, orientation, panel_height, instance_id) {
-    return new SimpleResourceMonitorApplet(orientation, panel_height, instance_id);
+function main(metadata, o, p_h, id) {
+    return new SimpleResourceMonitorApplet(o, p_h, id);
 }

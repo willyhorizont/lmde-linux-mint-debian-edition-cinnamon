@@ -1,20 +1,28 @@
 const Applet = imports.ui.applet;
 
-function FreeTextApplet(orientation, panel_height, instance_id) {
-    this._init(orientation, panel_height, instance_id);
+function FreeTextApplet(o, p_h, id) {
+    this._init(o, p_h, id);
 }
 
 FreeTextApplet.prototype = {
     __proto__: Applet.TextApplet.prototype,
 
-    _init: function(orientation, panel_height, instance_id) {
-        Applet.TextApplet.prototype._init.call(this, orientation, instance_id);
+    _init: function(o, p_h, id) {
+        Applet.TextApplet.prototype._init.call(this, o, id);
         this.set_applet_tooltip("Free Text");
 
-        this.set_applet_label("|         willyhorizont.github.io         |");
+        if (this.actor) {
+            this.actor.set_style("background-color: #C2066D;");
+        }
+
+        if (this._applet_label) {
+            this._applet_label.set_style("font-family: monospace, Courier New; color: #ffffff;");
+        }
+
+        this.set_applet_label("|         space available         |");
     }
 };
 
-function main(metadata, orientation, panel_height, instance_id) {
-    return new FreeTextApplet(orientation, panel_height, instance_id);
+function main(metadata, o, p_h, id) {
+    return new FreeTextApplet(o, p_h, id);
 }
