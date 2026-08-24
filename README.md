@@ -25,5 +25,5 @@ W = All Disk write rate;
 ↑ = Upload rate;  
 
 ## Screenshot
-![Simple Resouce Monitor Cinnamon Applet Screenshot 1](https://github.com/willyhorizont/simple-resource-monitor/blob/main/screenshot1.jpg)  
-![Simple Resouce Monitor Cinnamon Applet Screenshot 2](https://github.com/willyhorizont/simple-resource-monitor/blob/main/screenshot2.jpg)  
+![Simple Resouce Monitor Cinnamon Applet Screenshot 1](https://github.com/willyhorizont/cinnamon-applet-simple-resource-monitor/blob/main/screenshot1.jpg)  
+![Simple Resouce Monitor Cinnamon Applet Screenshot 2](https://github.com/willyhorizont/cinnamon-applet-simple-resource-monitor/blob/main/screenshot2.jpg)  
