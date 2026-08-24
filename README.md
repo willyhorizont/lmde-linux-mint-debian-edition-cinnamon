@@ -28,5 +28,4 @@ W = All Disk write rate;
 ↑ = Upload rate;  
 
 ### Screenshot
-![Simple Resouce Monitor Cinnamon Applet Screenshot 1](https://github.com/willyhorizont/lmde-linux-mint-debian-edition-cinnamon/blob/main/panel/cinnamon-applet-simple-resource-monitor/screenshot1.jpg)  
-![Simple Resouce Monitor Cinnamon Applet Screenshot 2](https://github.com/willyhorizont/lmde-linux-mint-debian-edition-cinnamon/blob/main/panel/cinnamon-applet-simple-resource-monitor/screenshot2.jpg)  
+![My Cinnamon Applet Screenshot](https://github.com/willyhorizont/lmde-linux-mint-debian-edition-cinnamon/blob/main/screenshot.jpg)  

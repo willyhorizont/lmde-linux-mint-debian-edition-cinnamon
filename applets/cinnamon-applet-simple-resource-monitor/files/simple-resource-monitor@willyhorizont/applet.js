@@ -35,7 +35,7 @@ SimpleResourceMonitorApplet.prototype = {
             CPU_RAW=$(awk '/^cpu / {print $2" "$3" "$4" "$5" "$6" "$7" "$8}' /proc/stat)
             GPU=$(cat /sys/class/drm/card0/device/gpu_busy_percent 2>/dev/null || echo "0")
             RAM_DATA=$(awk '/MemTotal/ {t=$2} /MemAvailable/ {a=$2} END {printf "%.2f/%.2f", (t-a)/1024/1024, t/1024/1024}' /proc/meminfo)
-            DISK_DATA=$(df -BG / | awk 'NR==2 {gsub("G",""); printf "%.2f/%.2f", $4, $2}')
+            DISK_DATA=$(df -B1 / | awk 'NR==2 {printf "%s/%s", $2, $4}')
             DISK_IO=$(awk '/ss/ || /sd/ || /nvme/ {r+=$6; w+=$10} END {print r" "w}' /proc/diskstats)
             NET_IO=$(awk -F: '/` + this.net_interface + `/ {print $2}' /proc/net/dev | awk '{print $1" "$9}')
             if [ -z "$NET_IO" ]; then NET_IO="0 0"; fi
@@ -65,7 +65,7 @@ SimpleResourceMonitorApplet.prototype = {
     },
     _format_rate: function(bytes_per_second) {
         if (bytes_per_second <= 0 || isNaN(bytes_per_second)) return "0B/s";
-        const units = ["B/s", "KB/s", "MB/s", "GB/s"];
+        const units = ["B/s", "KB/s", "MB/s"];
         let i = 0;
         while (bytes_per_second >= 1024 && i < units.length - 1) {
             bytes_per_second /= 1024;
@@ -109,7 +109,13 @@ SimpleResourceMonitorApplet.prototype = {
 
         const gpu = parts[2];
         const ram = parts[3];
-        const disk = parts[4];
+
+        const disk_raw = parts[4].split('/');
+        const disk_total_bytes = parseInt(disk_raw[0]) || 0;
+        const disk_available_bytes = parseInt(disk_raw[1]) || 0;
+        const disk_free_gb = (disk_available_bytes / 1e9).toFixed(2);
+        const disk_total_gb = (disk_total_bytes / 1e9).toFixed(2);
+        const disk_string = `${disk_free_gb}/${disk_total_gb}`;
 
         const disk_io = parts[5].split(' ');
         const current_disk_read = (parseInt(disk_io[0]) || 0) * 512;
@@ -141,7 +147,7 @@ SimpleResourceMonitorApplet.prototype = {
         const f_d = this._format_rate(d_rate);
         const f_u = this._format_rate(u_rate);
 
-        const labelText = `T ${temp}°C | C ${cpu_percent.toFixed(1)}% | G ${gpu}% | M ${ram}GB | D ${disk}GB | R ${f_r} | W ${f_w} | ↓ ${f_d} | ↑ ${f_u}`;
+        const labelText = `T ${temp}°C | C ${cpu_percent.toFixed(1)}% | G ${gpu}% | M ${ram}GB | D ${disk_string}GB | R ${f_r} | W ${f_w} | ↓ ${f_d} | ↑ ${f_u}`;
         this.set_applet_label(labelText);
     },
 

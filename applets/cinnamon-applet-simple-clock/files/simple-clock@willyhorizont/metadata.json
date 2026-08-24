@@ -1,0 +1,10 @@
+{
+    "uuid": "simple-clock@willyhorizont",
+    "name": "Simple Clock",
+    "description": "Show `MM / 12 'months' | dd / $total_days 'days' | ddd, dd MMM yyyy | $hour24:mm:ss | $hour12:mm:ss AP`",
+    "icon": "preferences-system-time",
+    "cinnamon-version": [
+        "5.0",
+        "6.0"
+    ]
+}

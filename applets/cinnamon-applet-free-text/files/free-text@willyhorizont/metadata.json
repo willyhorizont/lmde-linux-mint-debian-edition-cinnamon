@@ -1,0 +1,10 @@
+{
+    "uuid": "free-text@willyhorizont",
+    "name": "Free Text",
+    "description": "Show free text",
+    "icon": "preferences-desktop-font",
+    "cinnamon-version": [
+        "5.0",
+        "6.0"
+    ]
+}
