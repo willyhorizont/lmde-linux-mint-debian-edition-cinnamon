@@ -18,7 +18,7 @@ SimpleClockApplet.prototype = {
         }
 
         if (this._applet_label) {
-            this._applet_label.set_style("font-family: monospace, Courier New; color: #ffffff;");
+            this._applet_label.set_style("font-family: monospace, Courier New; color: #ffffff; font-size: 10px;");
         }
 
         this._upd();

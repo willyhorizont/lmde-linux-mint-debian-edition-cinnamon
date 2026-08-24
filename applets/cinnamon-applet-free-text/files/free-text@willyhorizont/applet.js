@@ -16,10 +16,10 @@ FreeTextApplet.prototype = {
         }
 
         if (this._applet_label) {
-            this._applet_label.set_style("font-family: monospace, Courier New; color: #ffffff;");
+            this._applet_label.set_style("font-family: monospace, Courier New; color: #ffffff; font-size: 10px;");
         }
 
-        this.set_applet_label("|         space available         |");
+        this.set_applet_label("|       SPACE AVAILABLE     |      willyhorizont.github.io      ");
     }
 };
 
