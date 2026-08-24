@@ -2,6 +2,9 @@
     "uuid": "simple-resource-monitor@willyhorizont",
     "name": "Simple Resource Monitor",
     "description": "Show CPU temp and usage, GPU usage, RAM usage, free Disk, Disk I/O, Download and Upload rate.",
+    "website": "https://github.com/willyhorizont/lmde-linux-mint-debian-edition-cinnamon/applets/cinnamon-applet-simple-resource-monitor",
+    "version": "0.0.8",
+    "author": "willyhorizont",
     "icon": "utilities-system-monitor",
     "cinnamon-version": [
         "5.0",

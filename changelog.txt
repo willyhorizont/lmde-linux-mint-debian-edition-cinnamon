@@ -1,3 +1,6 @@
+[Last updated: 25 Aug 2026 @ 04:10 AM][version: 0.0.8]
+update metadata;
+
 [Last updated: 25 Aug 2026 @ 02:16 AM][version: 0.0.7]
 update README;
 

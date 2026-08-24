@@ -2,6 +2,9 @@
     "uuid": "free-text@willyhorizont",
     "name": "Free Text",
     "description": "Show free text",
+    "website": "https://github.com/willyhorizont/lmde-linux-mint-debian-edition-cinnamon/applets/cinnamon-applet-free-text",
+    "version": "0.0.8",
+    "author": "willyhorizont",
     "icon": "preferences-desktop-font",
     "cinnamon-version": [
         "5.0",

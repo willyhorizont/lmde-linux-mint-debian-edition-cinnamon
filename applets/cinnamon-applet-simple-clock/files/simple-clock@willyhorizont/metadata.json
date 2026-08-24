@@ -2,6 +2,9 @@
     "uuid": "simple-clock@willyhorizont",
     "name": "Simple Clock",
     "description": "Show `MM / 12 'months' | dd / $total_days 'days' | ddd, dd MMM yyyy | $hour24:mm:ss | $hour12:mm:ss AP`",
+    "website": "https://github.com/willyhorizont/lmde-linux-mint-debian-edition-cinnamon/applets/cinnamon-applet-simple-clock",
+    "version": "0.0.8",
+    "author": "willyhorizont",
     "icon": "preferences-system-time",
     "cinnamon-version": [
         "5.0",
