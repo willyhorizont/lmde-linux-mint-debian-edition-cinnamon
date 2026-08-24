@@ -1,0 +1,10 @@
+{
+    "uuid": "simple-resource-monitor@willyhorizont",
+    "name": "Simple Resource Monitor",
+    "description": "Show CPU temp and usage, GPU usage, RAM usage, free Disk, Disk I/O, Download and Upload rate.",
+    "icon": "utilities-system-monitor",
+    "cinnamon-version": [
+        "5.0",
+        "6.0"
+    ]
+}
