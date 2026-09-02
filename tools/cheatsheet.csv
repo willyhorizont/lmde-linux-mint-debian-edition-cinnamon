@@ -1,0 +1,18 @@
+;                                                                                                            ;                                                 ; 
+; sudo apt update && sudo apt upgrade                                                                        ; Refresh metadata and upgrade all system packages; 
+;                                                                                                            ;                                                 ; 
+; sudo apt install <package>                                                                                 ; Install a new package                           ; 
+; sudo apt remove <package>                                                                                  ; Remove a package                                ; 
+; sudo apt autoremove                                                                                        ; Remove orphaned or unused dependencies          ; 
+; apt search <package>                                                                                       ; Search for a package in the repository          ; 
+; apt show <package>                                                                                         ; View detailed information of an app or package  ; 
+; apt list --installed                                                                                       ; View list of all currently installed apps       ; 
+; cat /var/log/apt/history.log                                                                               ; View installation / uninstallation history      ; 
+;                                                                                                            ;                                                 ; 
+; sudo apt clean                                                                                             ; Clean all local repository cache                ; 
+; ps eo pid,ppid,cmd,%mem --sort=-%mem | head -n 6                                                           ; Top 5 Memory-Hogging Processes                  ; 
+; cinnamon --replace & disown                                                                                ; Restart and refresh the Desktop Environment     ; 
+; update-desktop-database ~/.local/share/applications && sudo update-desktop-database /usr/share/applications; Update Desktop Applications database            ; 
+;                                                                                                            ;                                                 ; 
+; pkill -f mintinstall                                                                                       ; Force stop Software Manager                     ; 
+; sudo systemctl stop packagekit && sudo systemctl mask packagekit                                           ; Stop and completely disable background updater  ; 
