@@ -141,16 +141,16 @@ App.prototype = {
         const gpu = this._pad(gpu_v.toFixed(1), 4);
 
         const ram_raw = parts[3].split('/');
-        const ram_used_gbytes = parseFloat(ram_raw[0]) || 0;
-        const ram_tot_gbytes = parseFloat(ram_raw[1]) || 0;
-        const ram_used_str = this._pad(ram_used_gbytes.toFixed(2), 5);
-        const ram_tot_str = ram_tot_gbytes.toFixed(2);
+        const ram_used_GB = parseFloat(ram_raw[0]) || 0;
+        const ram_tot_GB = parseFloat(ram_raw[1]) || 0;
+        const ram_used_str = this._pad(ram_used_GB.toFixed(2), 5);
+        const ram_tot_str = ram_tot_GB.toFixed(2);
 
         const d_raw = parts[4].split('/');
         const d_tot_bytes = parseInt(d_raw[0]) || 0;
         const d_avail_bytes = parseInt(d_raw[1]) || 0;
-        const d_free_gbytes = (d_avail_bytes / 1e9).toFixed(2);
-        const d_tot_gbytes = (d_tot_bytes / 1e9).toFixed(2);
+        const d_free_GB = (d_avail_bytes / 1e9).toFixed(2);
+        const d_tot_GB = (d_tot_bytes / 1e9).toFixed(2);
 
         const disk_io = parts[5].split(' ');
         const cur_d_r = (parseInt(disk_io[0]) || 0) * 512;
@@ -188,9 +188,9 @@ App.prototype = {
             const out_d = f_d.includes("999999") ? "999999GB/s" : f_d;
             const out_u = f_u.includes("999999") ? "999999GB/s" : f_u;
 
-            rr = `T ${out_t} | C ${cpu}% | G ${gpu}% | M ${ram_used_str}/${ram_tot_str}GB | D ${d_free_gbytes}/${d_tot_gbytes}GB | R ${out_r} | W ${out_w} | ▼ ${out_d} | ▲ ${out_u} `;
+            rr = `T ${out_t} | C ${cpu}% | G ${gpu}% | M ${ram_used_str}/${ram_tot_str}GB | D ${d_free_GB}/${d_tot_GB}GB | R ${out_r} | W ${out_w} | ▼ ${out_d} | ▲ ${out_u} `;
         } else {
-            rr = `T ${temp}°C | C ${cpu}% | G ${gpu}% | M ${ram_used_str}/${ram_tot_str}GB | D ${d_free_gbytes}/${d_tot_gbytes}GB | R ${f_r} | W ${f_w} | ▼ ${f_d} | ▲ ${f_u} `;
+            rr = `T ${temp}°C | C ${cpu}% | G ${gpu}% | M ${ram_used_str}/${ram_tot_str}GB | D ${d_free_GB}/${d_tot_GB}GB | R ${f_r} | W ${f_w} | ▼ ${f_d} | ▲ ${f_u} `;
         }
 
         this.set_applet_label(rr);
